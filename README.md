@@ -26,3 +26,21 @@ Dependency Injection means an object receives the collaborators it needs instead
 
 The `users.controller.test.js` tests could not be written in 2.1 because `UsersController` constructed its own `UsersService` and repository internally, so there was no way to inject the `vi.fn()` fake service and assert calls to it. Likewise, the integration test "POST → 201, and the injected hasher was used" would be impossible because the service always used the real scrypt hasher and every controller instance shared one in-memory Map, so tests could not inject `fake-hash:${plain}` or guarantee a fresh empty store per test. The "a fake service can replace the real one entirely" test is another clear example for the same reason.
 
+## Assignment 2.3 — Written Questions
+
+1. What is the difference between authentication and authorization, and where is each enforced in the code?
+
+Authentication answers "who are you?" while authorization answers "what are you allowed to do?". Authentication is enforced by `createAuthenticate()` in `src/middleware/authenticate.js`: it reads the `Authorization: Bearer <token>` header, verifies the JWT through `TokenService.verifyAccessToken()`, and sets `req.user = { id, role }` or returns 401. Authorization runs afterwards in `src/middleware/authorize.js`: `requireRole()` implements RBAC by checking `req.user.role` against an allowed list, and `requirePermission()` implements ABAC by calling `can()` from `src/auth/policies.js` with the actor and resource attributes. The routes in `src/routes/users.routes.js` apply them, for example admin-only `GET /users` and ownership-based `GET /users/:id`.
+
+2. Why is the refresh token stored in an httpOnly, sameSite cookie while the access token is returned in JSON?
+
+The access token is short-lived (15 minutes) and must be readable by JavaScript so the client can attach it as a Bearer header; it is not useful for long if stolen. The refresh token lives for days and can mint new access tokens, so exposing it to JavaScript would make an XSS attack much more damaging. `httpOnly` means page scripts cannot read it, `sameSite=strict` stops other sites from sending it with cross-site requests (CSRF), and `secure` is enabled in production so it only travels over HTTPS. The cookie is also scoped to `path=/api/v1/auth`, so it is not sent to unrelated routes. `AuthController.#sendSession()` in `src/controllers/auth.controller.js` sets these options.
+
+3. What is refresh-token rotation with reuse detection, and why is it safer than a long-lived static refresh token?
+
+Rotation means every time a refresh token is used, `TokenService.rotateRefreshToken()` issues a brand-new token for the same family and immediately revokes the old one, recording `revokedAt` and `replacedBy`. Only SHA-256 hashes are stored in `RefreshTokensRepository`, never the raw token. Reuse detection means if an already-revoked token is presented again, the service assumes it was copied by an attacker and calls `revokeFamily()` to kill every token derived from that login, forcing both the legitimate user and the attacker to log in again. A static long-lived token would keep working indefinitely after a single leak; rotation limits the window and turns a leak into a detectable event.
+
+4. How do the OAuth `state` parameter and PKCE protect the GitHub login flow?
+
+`state` is a random value created by `createState()` in `src/auth/pkce.js`, stored in a short-lived httpOnly cookie, and sent to GitHub. The callback compares it with `?state=...`; a mismatch means the login was started by another site, so it is rejected as CSRF/login forgery. PKCE adds a second secret: `createPkcePair()` keeps a random `verifier` in the same cookie and sends only its SHA-256 `code_challenge` to GitHub. When exchanging the one-time code, the server sends the original `verifier`; GitHub checks the hash. An attacker who only steals the authorization `code` cannot redeem it without the verifier. Both are one-time, and the cookie is cleared in `githubCallback()`.
+
