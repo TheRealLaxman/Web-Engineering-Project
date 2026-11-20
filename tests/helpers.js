@@ -67,3 +67,10 @@ export const makeActor = (id, role = 'customer') => ({ id, role });
 export const accessTokenFor = (container, user) => container.tokenService.signAccessToken(user);
 
 export const TEST_SECRET = config.auth.jwtSecret;
+
+// ── 2.4 helper: registration plus a token, for tests using an authenticated actor ──
+export async function registerAsWithToken(app, person = SITA) {
+  const user = await registerAs(app, person);
+  const { accessToken } = await loginAs(app, person.email, person.password);
+  return { user, token: accessToken };
+}

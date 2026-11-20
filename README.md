@@ -44,3 +44,21 @@ Rotation means every time a refresh token is used, `TokenService.rotateRefreshTo
 
 `state` is a random value created by `createState()` in `src/auth/pkce.js`, stored in a short-lived httpOnly cookie, and sent to GitHub. The callback compares it with `?state=...`; a mismatch means the login was started by another site, so it is rejected as CSRF/login forgery. PKCE adds a second secret: `createPkcePair()` keeps a random `verifier` in the same cookie and sends only its SHA-256 `code_challenge` to GitHub. When exchanging the one-time code, the server sends the original `verifier`; GitHub checks the hash. An attacker who only steals the authorization `code` cannot redeem it without the verifier. Both are one-time, and the cookie is cleared in `githubCallback()`.
 
+## Assignment 2.4 — Written Questions
+
+1. Why do we check the image bytes with Sharp when Multer already checked the Content-Type? Give an attack that the second check stops.
+
+Multer's `fileFilter` only checks the client-declared `Content-Type` and filename, both of which an attacker fully controls. For example, a PHP webshell or an SVG containing `<script>` can be renamed to `shell.png` and sent as `image/png`, so Multer accepts it. `sharp().metadata()` inspects the actual magic bytes, rejects non-images with 400, and rejects SVG with 415. Re-encoding every accepted image into fresh WebP also means embedded scripts or unexpected payloads never reach storage.
+
+2. Compare uploading through the API with presigned URLs: when would you choose each?
+
+Uploading through the API is simple, works with local disk, and lets us validate and process the file before storing it, but all bytes pass through the server and consume memory and bandwidth. A presigned URL sends the browser directly to S3, so the API only handles a small JSON request and the later processing step; this is much better for large or high-volume files. Choose the API for small avatars and local development, and presigned URLs for production media at scale. With presigned uploads we must re-check ownership, declared size, and actual image bytes in `/complete`, because validation happens after the browser has already uploaded the raw object.
+
+3. Name three things our pipeline does to the image and why each matters (performance, privacy, security).
+
+`rotate()` applies the EXIF orientation so phone photos appear upright. `resize()` creates square 64, 256 and 512 px crops so the browser downloads only the size it needs, improving performance and keeping the UI consistent. Re-encoding to WebP at quality 80 makes files much smaller, while Sharp drops metadata by default so EXIF GPS and camera details do not leak. This re-encoding also destroys any malicious content hidden in the original file, which is an important security benefit.
+
+4. Why does every upload get a new random version in its filename?
+
+A new UUID version produces a new URL for every avatar upload, so browsers and CDNs cannot serve a stale cached image after a profile picture changes. Because the key is unique, we can safely mark uploads as immutable and cache them for a year. Random server-generated names also avoid using user-controlled filenames in paths and reduce the chance of collisions while old files are being deleted.
+
