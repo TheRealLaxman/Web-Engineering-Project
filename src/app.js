@@ -7,11 +7,11 @@ import { requestId } from './middleware/request-id.js';
 import { requestLogger } from './middleware/request-logger.js';
 import { requireJson } from './middleware/require-json.js';
 import { createAuthRouter } from './routes/auth.routes.js';
+import { booksRouter } from './routes/books.routes.js';
 import { createUsersRouter } from './routes/users.routes.js';
 
 // Builds the Express app from the objects in the container. Does NOT call listen().
 export function createApp(container) {
-  const { usersController, authController, authenticate, avatarController, avatarUpload } = container;
   const app = express();
 
   app.disable('x-powered-by');
@@ -20,6 +20,9 @@ export function createApp(container) {
   // ── 1. App-level middleware (runs top to bottom for EVERY request) ──
   app.use(requestId);
   if (!config.isTest) app.use(requestLogger);
+  app.use(container.securityHeaders); // Helmet: security headers on EVERY response
+  app.use(container.corsPolicy); // CORS: answer preflights, allow only our frontend origins
+  app.use('/api', container.apiRateLimit); // rate limit the API (not static files)
   app.use(requireJson); // JSON for normal requests, multipart/form-data for uploads
   app.use(express.json({ limit: config.bodyLimit }));
   app.use(cookieParser()); // reads the refresh_token httpOnly cookie
@@ -41,8 +44,9 @@ export function createApp(container) {
       }),
     );
   }
-  app.use('/api/v1/auth', createAuthRouter({ authController, authenticate }));
-  app.use('/api/v1/users', createUsersRouter({ usersController, avatarController, authenticate, avatarUpload }));
+  app.use('/api/v1/auth', createAuthRouter(container));
+  app.use('/api/v1/users', createUsersRouter(container));
+  app.use('/api/v1/books', booksRouter);
 
   // ── 3. Fallbacks (must be LAST) ──
   app.use(notFoundHandler);
