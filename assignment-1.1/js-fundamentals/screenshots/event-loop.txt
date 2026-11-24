@@ -1,0 +1,10 @@
+> node src/event-loop.js
+1 sync start
+2 sync inside async fn (before first await)
+2b sync end
+4 microtask: promise.then
+5 microtask: queueMicrotask
+5b microtask: after await
+3 nextTick
+7 macrotask: setImmediate
+6 macrotask: setTimeout 0
