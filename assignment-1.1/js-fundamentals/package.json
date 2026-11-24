@@ -1,0 +1,19 @@
+{
+  "name": "js-fundamentals",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "node --test",
+    "start": "node src/index.js",
+    "eventloop": "node src/event-loop.js",
+    "starvation": "node src/starvation.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module"
+}
