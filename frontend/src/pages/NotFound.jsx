@@ -1,0 +1,14 @@
+import { Link } from 'react-router-dom'
+
+export default function NotFound() {
+  return (
+    <section className="page narrow-page error-page">
+      <p className="eyebrow">404</p>
+      <h1>Page not found</h1>
+      <p className="lead">That route does not exist, or the requested user was not found.</p>
+      <Link className="button primary" to="/">
+        Back to home
+      </Link>
+    </section>
+  )
+}
