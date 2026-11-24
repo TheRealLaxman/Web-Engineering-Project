@@ -1,39 +1,61 @@
 import { Link } from 'react-router-dom'
+import { Button } from '../components/ui/Button.jsx'
+import { Card } from '../components/ui/Card.jsx'
 import { useAuth } from '../hooks/useAuth.js'
 
 export default function Home() {
   const { user } = useAuth()
 
   return (
-    <section className="page hero-page">
-      <p className="eyebrow">Unit 1.2 React SPA</p>
-      <h1>frontend-lab</h1>
-      <p className="lead">
-        A Vite + React 19 single-page app with nested routing, Context providers, persistent
-        hooks, and a data-router loader.
-      </p>
-      <div className="button-row">
-        <Link className="button primary" to="/users">
-          Browse users
-        </Link>
-        <Link className="button" to={user ? '/profile' : '/login'}>
-          {user ? `Open ${user.name}'s profile` : 'Sign in'}
-        </Link>
+    <section className="mx-auto w-full max-w-6xl px-4 py-10 md:px-8 md:py-16">
+      <div className="flex flex-col gap-8 md:flex-row md:items-center md:justify-between">
+        <div className="max-w-2xl">
+          <p className="mb-3 text-xs font-bold uppercase tracking-[0.14em] text-primary">
+            Unit 1.3 Styling Systems
+          </p>
+          <h1 className="mb-4 text-4xl font-bold tracking-tight text-fg md:text-6xl">
+            frontend-lab
+          </h1>
+          <p className="mb-6 text-lg text-muted">
+            A Vite + React 19 SPA styled with Tailwind v4 utility classes, responsive Grid and
+            Flexbox layouts, and CSS-variable design tokens.
+          </p>
+          <div className="flex flex-wrap gap-3">
+            <Button as={Link} to="/users">
+              Browse users
+            </Button>
+            <Button as={Link} variant="ghost" to={user ? '/profile' : '/login'}>
+              {user ? `Open ${user.name}'s profile` : 'Sign in'}
+            </Button>
+          </div>
+        </div>
+        <Card className="w-full md:w-80">
+          <p className="text-sm font-semibold text-primary">Tailwind v4</p>
+          <p className="mt-2 text-sm text-muted">
+            Utility-first styling driven by tokens that switch with the theme.
+          </p>
+        </Card>
       </div>
 
-      <div className="feature-grid">
-        <article className="feature-card">
-          <h2>Routing</h2>
-          <p>Nested layout, URL parameters, protected route, redirect, and a 404 page.</p>
-        </article>
-        <article className="feature-card">
-          <h2>Context</h2>
-          <p>Theme and auth state are broadcast through guarded custom hooks.</p>
-        </article>
-        <article className="feature-card">
-          <h2>Hooks</h2>
-          <p>Local storage persistence and an effect with a resize-listener cleanup.</p>
-        </article>
+      <div className="mt-12 grid grid-cols-[repeat(auto-fit,minmax(16rem,1fr))] gap-4">
+        <Card>
+          <h2 className="mb-2 text-lg font-semibold text-fg">Routing</h2>
+          <p className="text-sm text-muted">
+            Nested layout, URL parameters, protected route, redirect, and a 404 page.
+          </p>
+        </Card>
+        <Card>
+          <h2 className="mb-2 text-lg font-semibold text-fg">Context</h2>
+          <p className="text-sm text-muted">
+            Theme and auth state are broadcast through guarded custom hooks.
+          </p>
+        </Card>
+        <Card>
+          <h2 className="mb-2 text-lg font-semibold text-fg">Tokens</h2>
+          <p className="text-sm text-muted">
+            CSS variables feed Tailwind utilities and recolour the whole UI.
+          </p>
+        </Card>
       </div>
     </section>
   )

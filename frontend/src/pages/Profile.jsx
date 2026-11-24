@@ -1,33 +1,37 @@
+import { Button } from '../components/ui/Button.jsx'
+import { Card } from '../components/ui/Card.jsx'
 import { useAuth } from '../hooks/useAuth.js'
 
 export default function Profile() {
   const { user, logout } = useAuth()
 
   return (
-    <section className="page narrow-page">
-      <p className="eyebrow">Protected route</p>
-      <h1>Profile</h1>
-      <p className="lead">This page is wrapped in ProtectedRoute.</p>
+    <section className="mx-auto w-full max-w-2xl px-4 py-10 md:px-8 md:py-16">
+      <p className="mb-3 text-xs font-bold uppercase tracking-[0.14em] text-primary">
+        Protected route
+      </p>
+      <h1 className="mb-3 text-4xl font-bold tracking-tight text-fg">Profile</h1>
+      <p className="mb-8 text-lg text-muted">This page is wrapped in ProtectedRoute.</p>
 
-      <article className="form-card">
-        <div className="detail-meta">
+      <Card>
+        <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
-            <span className="meta-label">ID</span>
-            <p>{user?.id}</p>
+            <span className="text-xs font-semibold uppercase tracking-wide text-muted">ID</span>
+            <p className="mt-1 text-fg">{user?.id}</p>
           </div>
           <div>
-            <span className="meta-label">Name</span>
-            <p>{user?.name}</p>
+            <span className="text-xs font-semibold uppercase tracking-wide text-muted">Name</span>
+            <p className="mt-1 text-fg">{user?.name}</p>
           </div>
         </div>
-        <div className="field">
-          <span className="meta-label">Email</span>
-          <p>{user?.email}</p>
+        <div className="mb-6">
+          <span className="text-xs font-semibold uppercase tracking-wide text-muted">Email</span>
+          <p className="mt-1 text-fg">{user?.email}</p>
         </div>
-        <button type="button" className="button" onClick={logout}>
+        <Button variant="ghost" type="button" onClick={logout}>
           Logout
-        </button>
-      </article>
+        </Button>
+      </Card>
     </section>
   )
 }
