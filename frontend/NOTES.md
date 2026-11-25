@@ -40,3 +40,36 @@ Context is for low-frequency global values such as theme or current user. It is 
 ### What did StrictMode's double-invoke teach?
 
 In development, StrictMode mounts, unmounts, and remounts components to expose unsafe effects. The resize effect in `useViewportWidth` adds a listener and its cleanup removes the same listener, so the double-invoke leaves exactly one active listener instead of duplicating it. The cleanup also prevents updates after unmount.
+
+## Assignment 1.3 notes
+
+### Implementation
+
+- Tailwind v4 is installed with `@tailwindcss/vite`; no v3 fallback is used.
+- Design tokens are CSS variables exposed through `@theme inline` and documented in `docs/tokens.md`.
+- Dark mode is driven by the `data-theme` attribute; with no saved preference, `ThemeContext` now follows `prefers-color-scheme`.
+- The navbar and button rows use Flexbox. The users list uses `grid-cols-1 sm:grid-cols-2 lg:grid-cols-3`, and the Home feature grid uses `grid-cols-[repeat(auto-fit,minmax(16rem,1fr))]`.
+- `Button` and `Card` primitives in `src/components/ui/` are used across the pages.
+
+### Screenshots
+
+Capture these manually after running `npm run dev` and save them in `screenshots/`:
+
+1. `06-home-mobile-light.png` - `/` at 360px in light theme.
+2. `07-users-desktop-light.png` - `/users` at 1280px in light theme.
+3. `08-home-mobile-dark.png` - `/` at 360px in dark theme.
+4. `09-users-desktop-dark.png` - `/users` at 1280px in dark theme.
+
+### Short answers
+
+#### When to use Grid vs Flexbox
+
+Use Flexbox for one-dimensional layout such as navbars, toolbars, and button rows, where content decides the size and `flex-wrap` handles overflow. Use Grid for two-dimensional layout such as card galleries and dashboards, where the layout decides the size via `grid-template-columns` and `gap`. They compose well: a page can use Grid for its overall structure and Flexbox inside each card.
+
+#### Two pros and two cons of utility-first CSS
+
+Pros: it removes the need to invent BEM names and avoids dead CSS because only used classes are generated; it also gives a consistent spacing/colour scale and speeds up styling in markup. Cons: class lists make markup noisy; there is a vocabulary to learn, and repeated combinations should be extracted into components rather than duplicated CSS classes.
+
+#### Why tokens beat hard-coded colours
+
+Tokens give one named source of truth, so changing `--primary` updates every consumer. They also make dark mode a matter of swapping variable values, improve consistency across components, and avoid scattered hex values that drift apart.
