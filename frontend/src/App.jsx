@@ -4,7 +4,6 @@ import ProtectedRoute from './components/ProtectedRoute.jsx'
 import Home from './pages/Home.jsx'
 import Users from './pages/Users.jsx'
 import UserDetail from './pages/UserDetail.jsx'
-import { userLoader } from './data/users.js'
 import Login from './pages/Login.jsx'
 import Profile from './pages/Profile.jsx'
 import NotFound from './pages/NotFound.jsx'
@@ -15,12 +14,7 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <Home /> },
       { path: 'users', element: <Users /> },
-      {
-        path: 'users/:id',
-        element: <UserDetail />,
-        loader: userLoader,
-        errorElement: <NotFound />,
-      },
+      { path: 'users/:id', element: <UserDetail /> },
       { path: 'login', element: <Login /> },
       {
         path: 'profile',
