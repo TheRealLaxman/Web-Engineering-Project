@@ -58,7 +58,7 @@ export default function Layout() {
       </main>
 
       <footer className="border-t border-line text-sm text-muted">
-        <div className="mx-auto max-w-6xl p-4">Viewport: {viewportWidth}px · React SPA lab</div>
+        <div className="mx-auto max-w-6xl p-4">Viewport: {viewportWidth}px - React SPA lab</div>
       </footer>
     </div>
   )
