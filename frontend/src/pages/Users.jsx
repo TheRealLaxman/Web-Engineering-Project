@@ -8,6 +8,10 @@ import { useUiStore } from '../store/ui.js'
 
 const AddUserModal = lazy(() => import('../components/AddUserModal.jsx'))
 
+function UserSkeleton() {
+  return <div className="min-h-40 animate-pulse rounded-card bg-surface-alt" aria-hidden="true" />
+}
+
 export default function Users() {
   const { data: users = [], isPending, isError, error, refetch, isFetching } = useUsers()
   const view = useUiStore((s) => s.view)
@@ -26,7 +30,12 @@ export default function Users() {
   if (isPending) {
     return (
       <section className="mx-auto w-full max-w-6xl px-4 py-10 md:px-8 md:py-16">
-        <p role="status" className="text-muted">Loading users…</p>
+        <p role="status" className="mb-6 text-muted">Loading users…</p>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {Array.from({ length: 6 }, (_, index) => (
+            <UserSkeleton key={index} />
+          ))}
+        </div>
       </section>
     )
   }

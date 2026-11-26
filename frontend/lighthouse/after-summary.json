@@ -1,0 +1,47 @@
+{
+  "runs": [
+    {
+      "run": 1,
+      "score": 85,
+      "fcp": 2558,
+      "lcp": 3739,
+      "tbt": 95,
+      "cls": 0.038,
+      "jsTransferred": 117.7,
+      "imageTransferred": 47.4,
+      "totalTransferred": 171.7
+    },
+    {
+      "run": 2,
+      "score": 85,
+      "fcp": 2552,
+      "lcp": 3738,
+      "tbt": 83,
+      "cls": 0.038,
+      "jsTransferred": 117.7,
+      "imageTransferred": 47.4,
+      "totalTransferred": 171.7
+    },
+    {
+      "run": 3,
+      "score": 85,
+      "fcp": 2562,
+      "lcp": 3737,
+      "tbt": 108,
+      "cls": 0.038,
+      "jsTransferred": 117.7,
+      "imageTransferred": 47.4,
+      "totalTransferred": 171.7
+    }
+  ],
+  "median": {
+    "performance": 85,
+    "fcp": 2558,
+    "lcp": 3738,
+    "tbt": 95,
+    "cls": 0.038,
+    "jsTransferred": 117.7,
+    "imageTransferred": 47.4,
+    "totalTransferred": 171.7
+  }
+}

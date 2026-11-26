@@ -29,12 +29,18 @@ export default function Home() {
             </Button>
           </div>
         </div>
-        <Card className="w-full md:w-80">
-          <p className="text-sm font-semibold text-primary">Tailwind v4</p>
-          <p className="mt-2 text-sm text-muted">
-            Utility-first styling driven by tokens that switch with the theme.
-          </p>
-        </Card>
+        <img
+          src="/hero-800.webp"
+          srcSet="/hero-480.webp 480w, /hero-800.webp 800w, /hero-1200.webp 1200w"
+          sizes="(min-width: 64rem) 320px, 100vw"
+          width="1200"
+          height="800"
+          loading="eager"
+          fetchPriority="high"
+          decoding="async"
+          className="aspect-[3/2] w-full rounded-card object-cover shadow-sm"
+          alt="Developer workspace with laptop"
+        />
       </div>
 
       <div className="mt-12 grid grid-cols-[repeat(auto-fit,minmax(16rem,1fr))] gap-4">
@@ -56,6 +62,19 @@ export default function Home() {
             CSS variables feed Tailwind utilities and recolour the whole UI.
           </p>
         </Card>
+      </div>
+
+      <div className="mt-8 flex items-center gap-3">
+        <img
+          src="/hero-480.webp"
+          width="64"
+          height="64"
+          loading="lazy"
+          decoding="async"
+          className="h-16 w-16 rounded-full object-cover"
+          alt=""
+        />
+        <p className="text-sm text-muted">Below-the-fold preview uses lazy loading and async decode.</p>
       </div>
     </section>
   )
