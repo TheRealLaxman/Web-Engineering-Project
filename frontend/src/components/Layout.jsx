@@ -6,7 +6,11 @@ import { useViewportWidth } from '../hooks/useViewportWidth.js'
 import { Button } from './ui/Button.jsx'
 
 function PageSpinner() {
-  return <p role="status" className="p-8 text-center text-muted">Loading…</p>
+  return (
+    <div role="status" className="flex min-h-64 items-center justify-center p-8 text-muted">
+      Loading…
+    </div>
+  )
 }
 
 export default function Layout() {
