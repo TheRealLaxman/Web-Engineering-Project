@@ -1,22 +1,20 @@
-import { useState } from 'react'
+import { lazy, Suspense, useState } from 'react'
 import { Link } from 'react-router-dom'
 import UserCard from '../components/UserCard.jsx'
 import { Button } from '../components/ui/Button.jsx'
 import { Card } from '../components/ui/Card.jsx'
-import { useCreateUser } from '../hooks/useCreateUser.js'
 import { useUsers } from '../hooks/useUsers.js'
 import { useUiStore } from '../store/ui.js'
 
+const AddUserModal = lazy(() => import('../components/AddUserModal.jsx'))
+
 export default function Users() {
   const { data: users = [], isPending, isError, error, refetch, isFetching } = useUsers()
-  const createUser = useCreateUser()
   const view = useUiStore((s) => s.view)
   const search = useUiStore((s) => s.search)
   const setView = useUiStore((s) => s.setView)
   const setSearch = useUiStore((s) => s.setSearch)
-  const [name, setName] = useState('')
-  const [email, setEmail] = useState('')
-  const [formError, setFormError] = useState('')
+  const [showAddUser, setShowAddUser] = useState(false)
 
   const query = search.trim().toLowerCase()
   const filteredUsers = users.filter((user) =>
@@ -24,26 +22,6 @@ export default function Users() {
       .toLowerCase()
       .includes(query),
   )
-
-  const handleCreate = async (event) => {
-    event.preventDefault()
-    if (!name.trim() || !email.includes('@')) {
-      setFormError('Enter a name and a valid email.')
-      return
-    }
-    setFormError('')
-    try {
-      await createUser.mutateAsync({
-        name: name.trim(),
-        email: email.trim(),
-        company: { name: 'Lab Member' },
-      })
-      setName('')
-      setEmail('')
-    } catch (err) {
-      setFormError(err instanceof Error ? err.message : 'Failed to create user.')
-    }
-  }
 
   if (isPending) {
     return (
@@ -77,41 +55,15 @@ export default function Users() {
         Server data comes from TanStack Query; view and search are UI state in Zustand.
       </p>
 
-      <Card className="mb-6">
-        <form className="grid gap-4 sm:grid-cols-[1fr_1fr_auto]" onSubmit={handleCreate}>
-          <div>
-            <label className="mb-2 block text-sm font-semibold text-muted" htmlFor="new-name">Name</label>
-            <input
-              id="new-name"
-              className="w-full rounded-card border border-line bg-bg px-3 py-2 text-fg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="New user name"
-            />
-          </div>
-          <div>
-            <label className="mb-2 block text-sm font-semibold text-muted" htmlFor="new-email">Email</label>
-            <input
-              id="new-email"
-              className="w-full rounded-card border border-line bg-bg px-3 py-2 text-fg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="name@example.com"
-            />
-          </div>
-          <div className="flex items-end">
-            <Button type="submit" disabled={createUser.isPending} className="w-full sm:w-auto">
-              {createUser.isPending ? 'Adding…' : 'Add user'}
-            </Button>
-          </div>
-        </form>
-        {formError || createUser.isError ? (
-          <p role="alert" className="mt-3 text-sm text-danger">
-            {formError || createUser.error?.message}
-          </p>
-        ) : null}
+      <Card className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <p className="text-sm text-muted">Create a new directory entry with a lazy-loaded form.</p>
+        <Button type="button" onClick={() => setShowAddUser(true)}>Add user</Button>
       </Card>
+      {showAddUser ? (
+        <Suspense fallback={<p role="status" className="mb-6 text-muted">Loading add-user form…</p>}>
+          <AddUserModal onClose={() => setShowAddUser(false)} />
+        </Suspense>
+      ) : null}
 
       <Card className="mb-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-end">

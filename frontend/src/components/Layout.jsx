@@ -1,8 +1,13 @@
+import { Suspense } from 'react'
 import { NavLink, Outlet } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth.js'
 import { useTheme } from '../hooks/useTheme.js'
 import { useViewportWidth } from '../hooks/useViewportWidth.js'
 import { Button } from './ui/Button.jsx'
+
+function PageSpinner() {
+  return <p role="status" className="p-8 text-center text-muted">Loading…</p>
+}
 
 export default function Layout() {
   const { theme, toggle } = useTheme()
@@ -28,7 +33,11 @@ export default function Layout() {
             <NavLink to="/" end className={navClass}>
               Home
             </NavLink>
-            <NavLink to="/users" className={navClass}>
+            <NavLink
+              to="/users"
+              className={navClass}
+              onMouseEnter={() => import('../pages/Users.jsx')}
+            >
               Users
             </NavLink>
             {user ? (
@@ -54,7 +63,9 @@ export default function Layout() {
       </header>
 
       <main className="mx-auto w-full max-w-6xl flex-1 p-4 md:p-8">
-        <Outlet />
+        <Suspense fallback={<PageSpinner />}>
+          <Outlet />
+        </Suspense>
       </main>
 
       <footer className="border-t border-line text-sm text-muted">
