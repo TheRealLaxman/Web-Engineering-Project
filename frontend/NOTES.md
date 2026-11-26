@@ -73,3 +73,36 @@ Pros: it removes the need to invent BEM names and avoids dead CSS because only u
 #### Why tokens beat hard-coded colours
 
 Tokens give one named source of truth, so changing `--primary` updates every consumer. They also make dark mode a matter of swapping variable values, improve consistency across components, and avoid scattered hex values that drift apart.
+
+## Assignment 1.4 notes
+
+### Implementation
+
+- TanStack Query v5 is installed with React Query Devtools; QueryClientProvider wraps the app in src/main.jsx with staleTime: 30_000 and etry: 1.
+- src/api/users.js is the only module that knows the API base URL (VITE_API_URL, defaulting to JSONPlaceholder). Hooks in src/hooks/useUsers.js expose useUsers/useUser; useCreateUser performs a mutation.
+- The users list and detail pages use Query loading/error/success states. The detail route no longer depends on the old router loader.
+- The "Add user" form uses useMutation; submit is disabled while pending and errors are shown inline. For JSONPlaceholder the created user is patched into cache with setQueryData because the fake API does not persist writes. With a real source-of-truth API, invalidateQueries({ queryKey: ['users'] }) is preferred so the cache refetches authoritative server data.
+- Zustand (src/store/ui.js) stores UI state only: grid/list view and search text. View is persisted via partialize; query results are never copied into the store.
+
+### Screenshots
+
+Capture these manually after running 
+pm run dev and save them in screenshots/:
+
+1. 10-query-devtools-users.png - React Query Devtools showing cached ['users'].
+2. 11-users-loading.png - loading state (throttle network in DevTools).
+3. 12-users-error.png - error state (break VITE_API_URL or block request) with Retry.
+
+### Short answers
+
+#### Server state vs client state
+
+Server state lives on a server and the UI keeps a cached copy; it needs fetching, caching, deduplication, invalidation, retries, and background refresh. Client state lives only in the browser, such as modal open state, selected tab, or grid/list view, and is owned by UI components or a client store.
+
+#### One reason to choose Redux Toolkit over Zustand
+
+Redux Toolkit is a better fit when a large team needs strict conventions and predictable cross-cutting client-state flows, especially with devtools/time-travel style debugging, middleware, or RTK Query integration. Zustand is lighter for small/medium UI state with minimal boilerplate.
+
+#### What does staleTime do?
+
+staleTime controls how long fetched data is considered fresh. While fresh, TanStack Query can serve cached data without refetching on mount/focus; after it becomes stale, Query is allowed to refetch in the background to keep data up to date.
